@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -17,6 +17,8 @@ export default function ScrollSequence({
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const imagesRef = useRef([]);
+  const targetFrameRef = useRef(0);
+  const lastDrawnFrameRef = useRef(-1);
 
   // Determine initial folder based on viewport width to avoid cascading re-renders
   const [folder, setFolder] = useState(() => {
@@ -52,36 +54,64 @@ export default function ScrollSequence({
     return () => window.removeEventListener("resize", handleResize);
   }, [name]);
 
-  const draw = (index) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const img = imagesRef.current[index];
-    if (!img || !img.complete || !img.naturalWidth || !img.naturalHeight) return;
+  const draw = useCallback(
+    (index) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+      const clampedIndex = Math.min(frameCount - 1, Math.max(0, Math.round(index)));
+      targetFrameRef.current = clampedIndex;
 
-    // Enable high-quality bicubic interpolation for crisp rendering on retina displays
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+      const img = imagesRef.current[clampedIndex];
+      let imgToDraw = img && img.complete && img.naturalWidth && img.naturalHeight ? img : null;
 
-    const cr = canvas.width / canvas.height;
-    const ir = img.naturalWidth / img.naturalHeight;
-    let w, h, x, y;
-    if (ir > cr) {
-      h = canvas.height;
-      w = h * ir;
-      x = (canvas.width - w) / 2;
-      y = 0;
-    } else {
-      w = canvas.width;
-      h = w / ir;
-      x = 0;
-      y = (canvas.height - h) / 2;
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, x, y, w, h);
-  };
+      // If target frame isn't loaded yet and nothing has been drawn yet, search for closest loaded frame
+      if (!imgToDraw && lastDrawnFrameRef.current === -1) {
+        for (let offset = 1; offset < frameCount; offset++) {
+          const prev = imagesRef.current[clampedIndex - offset];
+          if (prev && prev.complete && prev.naturalWidth) {
+            imgToDraw = prev;
+            break;
+          }
+          const next = imagesRef.current[clampedIndex + offset];
+          if (next && next.complete && next.naturalWidth) {
+            imgToDraw = next;
+            break;
+          }
+        }
+      }
+
+      // If current target image isn't loaded and we already have a drawn frame on canvas,
+      // retain the current canvas frame without jumping or blanking out.
+      if (!imgToDraw) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      // Enable high-quality bicubic interpolation for crisp rendering on retina displays
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      const cr = canvas.width / canvas.height;
+      const ir = imgToDraw.naturalWidth / imgToDraw.naturalHeight;
+      let w, h, x, y;
+      if (ir > cr) {
+        h = canvas.height;
+        w = h * ir;
+        x = (canvas.width - w) / 2;
+        y = 0;
+      } else {
+        w = canvas.width;
+        h = w / ir;
+        x = 0;
+        y = (canvas.height - h) / 2;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(imgToDraw, x, y, w, h);
+      lastDrawnFrameRef.current = clampedIndex;
+    },
+    [frameCount]
+  );
 
   const rawBase = import.meta.env.BASE_URL || "/";
   const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
@@ -126,8 +156,11 @@ export default function ScrollSequence({
         if (cancelled) return;
         localLoaded += 1;
         setLoadedCount(localLoaded);
-        if (i === 0) {
-          draw(0);
+        // Do not allow asynchronously loaded frames to overwrite the active frame
+        // with an incorrect one. Only draw if this loaded image matches the target frame,
+        // or if no frame has ever been rendered to the canvas yet.
+        if (targetFrameRef.current === i || lastDrawnFrameRef.current === -1) {
+          draw(targetFrameRef.current);
         }
         checkCompletion();
       };
@@ -145,34 +178,64 @@ export default function ScrollSequence({
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [folder, frameCount, baseUrl, name]);
+  }, [folder, frameCount, baseUrl, name, draw]);
 
   useGSAP(
     () => {
       const canvas = canvasRef.current;
-      const state = { frame: 0 };
+      const state = { frame: targetFrameRef.current || 0 };
 
-      const resize = () => {
+      // Prevent GSAP ScrollTrigger from jumping when mobile address bar shows/hides
+      ScrollTrigger.config({ ignoreMobileResize: true });
+
+      let lastWidth = window.innerWidth;
+      let lastHeight = window.innerHeight;
+
+      const resize = (force = false) => {
+        if (!canvas) return;
+        const curW = window.innerWidth;
+        const curH = window.innerHeight;
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        if (canvas) {
-          const targetW = Math.round(window.innerWidth * dpr);
-          const targetH = Math.round(window.innerHeight * dpr);
+
+        // On mobile devices, vertical scrolling triggers window.resize when the browser's
+        // URL/navigation bar collapses or expands (only height changes by ~50-100px).
+        // Avoid re-allocating canvas backing store dimensions during scroll-induced address bar changes
+        // because resizing backing-store clears the canvas and alters the aspect ratio,
+        // causing abrupt jumps in subject scale and position.
+        const widthChanged = Math.abs(curW - lastWidth) > 2;
+        const heightChangedDramatically = Math.abs(curH - lastHeight) > 200;
+
+        if (force || widthChanged || heightChangedDramatically) {
+          lastWidth = curW;
+          lastHeight = curH;
+
+          const targetW = Math.round(curW * dpr);
+          const targetH = Math.round(curH * dpr);
           if (canvas.width !== targetW || canvas.height !== targetH) {
             canvas.width = targetW;
             canvas.height = targetH;
           }
         }
-        draw(Math.round(state.frame));
+        draw(targetFrameRef.current);
       };
-      resize();
-      window.addEventListener("resize", resize);
-      window.addEventListener("orientationchange", resize);
+
+      resize(true);
+      const onResize = () => resize(false);
+      const onOrientationChange = () => {
+        setTimeout(() => resize(true), 100);
+      };
+
+      window.addEventListener("resize", onResize);
+      window.addEventListener("orientationchange", onOrientationChange);
 
       gsap.to(state, {
         frame: frameCount - 1,
         ease: "none",
         snap: "frame",
-        onUpdate: () => draw(state.frame),
+        onUpdate: () => {
+          const frameIndex = Math.min(frameCount - 1, Math.max(0, Math.round(state.frame)));
+          draw(frameIndex);
+        },
         scrollTrigger: {
           trigger: wrapRef.current,
           start: "top top",
@@ -187,8 +250,8 @@ export default function ScrollSequence({
       ScrollTrigger.refresh();
 
       return () => {
-        window.removeEventListener("resize", resize);
-        window.removeEventListener("orientationchange", resize);
+        window.removeEventListener("resize", onResize);
+        window.removeEventListener("orientationchange", onOrientationChange);
       };
     },
     { dependencies: [frameCount, scrollLength], scope: wrapRef }
@@ -198,16 +261,16 @@ export default function ScrollSequence({
     if (status === "ready") {
       ScrollTrigger.sort();
       ScrollTrigger.refresh();
-      draw(0);
+      draw(targetFrameRef.current);
     }
-  }, [status]);
+  }, [status, draw]);
 
   const isFallback = status === "fallback";
 
   return (
     <section
       ref={wrapRef}
-      className="relative h-screen min-h-[100dvh] w-full overflow-hidden bg-black"
+      className="relative h-screen w-full overflow-hidden bg-black"
     >
       {/* Primary Canvas for Frame-by-Frame Scroll Scrub */}
       <canvas

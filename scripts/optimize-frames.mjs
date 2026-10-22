@@ -7,17 +7,17 @@ const sequences = [
 ];
 
 const variants = [
-  // Desktop: Pristine 1080p landscape (1920x1080) at high quality
+  // Desktop: Pristine 1080p (1920x1080) 16:9 source aspect ratio
   {
     suffix: "",
     resizeOptions: { width: 1920, height: 1080, fit: "inside" },
     quality: 75,
   },
-  // Mobile: Portrait-optimized (1080x1080 centered crop) preserving full 1080p vertical resolution
+  // Mobile: Identical 16:9 source aspect ratio and composition (1920x1080) at high-efficiency quality
   {
     suffix: "-sm",
-    resizeOptions: { width: 1080, height: 1080, fit: "cover", position: "center" },
-    quality: 74,
+    resizeOptions: { width: 1920, height: 1080, fit: "inside" },
+    quality: 70,
   },
 ];
 
