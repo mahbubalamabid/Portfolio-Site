@@ -1,46 +1,15 @@
 import { useState } from "react";
-import { FolderGit2, ExternalLink, Check, ArrowUpRight, Eye, FileText } from "lucide-react";
+import { FolderGit2, ExternalLink, Check, Eye, FileText, ArrowRight } from "lucide-react";
 import { GithubIcon } from "./Icons";
-import devstackPreviewImg from "../assets/projects/devstack-preview.webp";
+import { Link } from "../context/RouterContext";
+import { projectsData } from "../data/projectsData";
 
 export default function ProjectsSection() {
   const [filter, setFilter] = useState("all");
   const [hoveredCardId, setHoveredCardId] = useState(null);
   const [pinnedCardId, setPinnedCardId] = useState(null);
 
-  const projects = [
-    {
-      id: "devstack",
-      title: "DevStack — Technology Stack Explorer",
-      category: "frontend",
-      categoryLabel: "Frontend · React Practice Project",
-      subtitle:
-        "Explore development technologies, compare their ratings and popularity, and build a personalized tech stack.",
-      description:
-        "DevStack is a React-based practice project built to apply and strengthen React development skills through an interactive interface. It allows users to explore technology cards, view ratings and popularity indicators, and create a personalized stack by adding or removing technologies.",
-      capabilities: [
-        "Browse technologies through interactive technology cards.",
-        "View technology ratings and popularity badges.",
-        "Add technologies to a personalized stack.",
-        "Remove technologies from the selected stack.",
-        "Interact with a responsive interface built using modern frontend tools.",
-      ],
-      tech: ["React", "JavaScript", "Vite", "Tailwind CSS", "DaisyUI"],
-      github: "https://github.com/mahbubalamabid/DevStack-Project",
-      demo: "https://dev-stack-project-xi.vercel.app/",
-      previewImg: devstackPreviewImg,
-      accent: "from-cyan-500/20 via-teal-500/10 to-transparent",
-      badgeColor: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30",
-      isPlaceholder: false,
-    },
-    {
-      id: "placeholder-project",
-      title: "Project details coming soon",
-      category: "upcoming",
-      accent: "from-white/[0.04] to-transparent",
-      isPlaceholder: true,
-    },
-  ];
+  const projects = projectsData;
 
   const filterTabs = [
     { id: "all", label: "All Projects" },
@@ -130,6 +99,9 @@ export default function ProjectsSection() {
                         <p className="text-base sm:text-lg font-medium text-zinc-400">
                           Project details coming soon
                         </p>
+                        <div className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 text-zinc-500 border border-white/5 text-xs font-medium">
+                          <span>Details Available Upon Launch</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -279,27 +251,49 @@ export default function ProjectsSection() {
                       </div>
                     </div>
 
-                    {/* Footer: repository/details link and live-demo link */}
+                    {/* Footer: View Details, Repository and live-demo link */}
                     <div className="px-4 pb-4 min-[360px]:px-6 min-[360px]:pb-6 sm:px-8 sm:pb-8 pt-0 border-t border-white/5">
                       <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-md"
+                        {/* View Details Primary Action Button */}
+                        <Link
+                          to={`/projects/${project.slug || project.id}`}
+                          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-4 py-2 rounded-full bg-cyan-500/10 hover:bg-cyan-500 text-cyan-300 hover:text-black border border-cyan-500/30 hover:border-cyan-400 shadow-sm hover:shadow-cyan-500/25 transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 group/btn"
+                          title={`View full details for ${project.title}`}
+                          aria-label={`View full details for ${project.title}`}
                         >
-                          <span>Explore Repository & Details</span>
-                          <ArrowUpRight className="w-4 h-4" />
-                        </a>
-                        <a
-                          href={project.demo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-cyan-500/10 text-zinc-300 hover:text-cyan-300 border border-white/10 hover:border-cyan-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                        >
-                          <span>Live Demo</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
+                          <span>View Details</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                        </Link>
+
+                        {/* Secondary Links: GitHub & Live Demo */}
+                        <div className="flex items-center gap-2">
+                          {project.github && (
+                            <a
+                              href={project.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                              title="GitHub Repository"
+                              aria-label="GitHub Repository"
+                            >
+                              <GithubIcon className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Repo</span>
+                            </a>
+                          )}
+                          {project.demo && (
+                            <a
+                              href={project.demo}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-cyan-500/10 text-zinc-300 hover:text-cyan-300 border border-white/10 hover:border-cyan-500/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                              title="Live Demo"
+                              aria-label="Live Demo"
+                            >
+                              <span>Live Demo</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

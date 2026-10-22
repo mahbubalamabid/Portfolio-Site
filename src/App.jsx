@@ -1,3 +1,10 @@
+import { lazy, Suspense } from "react";
+import { RouterProvider } from "./context/RouterContext";
+import { useRouter } from "./context/useRouter";
+import { getProjectBySlug } from "./data/projectsData";
+
+const ProjectDetailsPage = lazy(() => import("./components/ProjectDetailsPage"));
+const ProjectNotFound = lazy(() => import("./components/ProjectNotFound"));
 import InitialLoadingScreen from "./components/InitialLoadingScreen";
 import SmoothScroll from "./components/SmoothScroll";
 import ScrollSequence from "./components/ScrollSequence";
@@ -13,13 +20,36 @@ import ProjectsSection from "./components/ProjectsSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 
-export default function App() {
+function AppContent() {
+  const { route } = useRouter();
+
+  if (route.type === "project-details") {
+    const project = getProjectBySlug(route.slug);
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-[#050507]" />}>
+        {project ? (
+          <ProjectDetailsPage project={project} />
+        ) : (
+          <ProjectNotFound slug={route.slug} />
+        )}
+      </Suspense>
+    );
+  }
+
+  if (route.type === "not-found") {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-[#050507]" />}>
+        <ProjectNotFound slug={route.invalidPath} />
+      </Suspense>
+    );
+  }
+
+  // Home Route
   return (
     <>
       <InitialLoadingScreen />
-      <SmoothScroll>
-        <div className="relative bg-black text-white selection:bg-cyan-400 selection:text-black">
-          {/* Navigation Bar */}
+      <div className="relative bg-black text-white selection:bg-cyan-400 selection:text-black">
+        {/* Navigation Bar */}
         <Navbar />
 
         {/* 1. Hero Canvas Sequence */}
@@ -56,7 +86,16 @@ export default function App() {
         {/* 9. Footer */}
         <Footer />
       </div>
-    </SmoothScroll>
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <RouterProvider>
+      <SmoothScroll>
+        <AppContent />
+      </SmoothScroll>
+    </RouterProvider>
   );
 }
