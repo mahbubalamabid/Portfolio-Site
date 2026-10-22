@@ -4,27 +4,27 @@ export default function StatsSection() {
   const stats = [
     {
       icon: Layers,
-      value: "Multi-Tenant",
-      label: "SaaS Architecture Specialist",
-      desc: "Isolated data, scalable roles & robust cloud systems",
+      value: "CSE Student",
+      label: "Computer Science & Engineering",
+      desc: "Building a strong foundation in programming and software development.",
     },
     {
       icon: Code,
-      value: "10+",
-      label: "Full-Stack Web Projects",
-      desc: "Production applications built with React & modern stacks",
+      value: "2+ Projects",
+      label: "Hands-on Development",
+      desc: "Practising web development by building small projects with modern technologies.",
     },
     {
       icon: Users,
-      value: "50+",
-      label: "Developers Mentored",
-      desc: "Live conceptual sessions & hands-on code workshops",
+      value: "7 +",
+      label: "Current Learning Stack",
+      desc: "HTML, CSS, JavaScript, TypeScript, React, Next.js and Tailwind CSS.",
     },
     {
       icon: Sparkles,
-      value: "100%",
-      label: "Responsive & Performant",
-      desc: "Smooth animations, accessible UI & modern code standards",
+      value: "Future-Focused",
+      label: "Continuous Learning",
+      desc: "Developing practical skills toward a Full Stack Web Engineer career.",
     },
   ];
 

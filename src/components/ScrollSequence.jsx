@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useMotionValue } from "motion/react";
+import { motion, useMotionValue, useTransform, useReducedMotion } from "motion/react";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -10,6 +10,8 @@ export default function ScrollSequence({
   name,
   frameCount,
   scrollLength = 4000,
+  initialOverlayOpacity = 0.7,
+  fadeEndProgress = 0.45,
   children, // (progress) => JSX
 }) {
   const wrapRef = useRef(null);
@@ -20,25 +22,17 @@ export default function ScrollSequence({
   const loaded = loadedCount === frameCount;
 
   const progress = useMotionValue(0);
+  const shouldReduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    setFolder(window.innerWidth < 768 ? `${name}-sm` : name);
-  }, [name]);
-
-  useEffect(() => {
-    if (!folder) return;
-    let cancelled = false;
-    setLoadedCount(0);
-    imagesRef.current = Array.from({ length: frameCount }, (_, i) => {
-      const img = new Image();
-      img.src = `/frames/${folder}/frame_${String(i + 1).padStart(4, "0")}.webp`;
-      img.onload = () => !cancelled && setLoadedCount((c) => c + 1);
-      return img;
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [folder, frameCount]);
+  // Scroll-based dark overlay reveal: starts dark for readability, fades to transparent
+  const dynamicOverlayOpacity = useTransform(
+    progress,
+    [0, fadeEndProgress],
+    [initialOverlayOpacity, 0]
+  );
+  const overlayOpacity = shouldReduceMotion
+    ? initialOverlayOpacity * 0.75
+    : dynamicOverlayOpacity;
 
   const draw = (index) => {
     const canvas = canvasRef.current;
@@ -57,16 +51,42 @@ export default function ScrollSequence({
     ctx.drawImage(img, x, y, w, h);
   };
 
+  useEffect(() => {
+    setFolder(window.innerWidth < 768 ? `${name}-sm` : name);
+  }, [name]);
+
+  useEffect(() => {
+    if (!folder) return;
+    let cancelled = false;
+    setLoadedCount(0);
+    imagesRef.current = Array.from({ length: frameCount }, (_, i) => {
+      const img = new Image();
+      img.src = `/frames/${folder}/frame_${String(i + 1).padStart(4, "0")}.webp`;
+      img.onload = () => {
+        if (cancelled) return;
+        setLoadedCount((c) => c + 1);
+        if (i === 0) {
+          draw(0);
+        }
+      };
+      return img;
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [folder, frameCount]);
+
   useGSAP(
     () => {
-      if (!loaded) return;
       const canvas = canvasRef.current;
       const state = { frame: 0 };
 
       const resize = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = window.innerWidth * dpr;
-        canvas.height = window.innerHeight * dpr;
+        if (canvas) {
+          canvas.width = window.innerWidth * dpr;
+          canvas.height = window.innerHeight * dpr;
+        }
         draw(Math.round(state.frame));
       };
       resize();
@@ -87,12 +107,21 @@ export default function ScrollSequence({
         },
       });
 
+      ScrollTrigger.sort();
       ScrollTrigger.refresh();
 
       return () => window.removeEventListener("resize", resize);
     },
-    { dependencies: [loaded], scope: wrapRef }
+    { dependencies: [frameCount, scrollLength], scope: wrapRef }
   );
+
+  useEffect(() => {
+    if (loaded) {
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+      draw(0);
+    }
+  }, [loaded]);
 
   return (
     <section
@@ -101,6 +130,13 @@ export default function ScrollSequence({
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+
+      {/* Dedicated scroll-based dark overlay reveal layer */}
+      <motion.div
+        style={{ opacity: overlayOpacity }}
+        className="absolute inset-0 bg-black pointer-events-none z-[1]"
+        aria-hidden="true"
+      />
 
       {!loaded && (
         <div className="absolute inset-0 z-20 grid place-items-center bg-black text-white">

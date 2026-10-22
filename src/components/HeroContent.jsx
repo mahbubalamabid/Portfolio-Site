@@ -25,26 +25,31 @@ export default function HeroContent({ progress }) {
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-cyan-400/30 backdrop-blur-md mb-6 shadow-lg shadow-cyan-500/10">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs sm:text-sm font-medium tracking-wide text-cyan-300">
-            Full-Stack Software Engineer • Web Instructor
+            Full-Stack Web Engineer
           </span>
         </div>
 
         {/* Name Title */}
-        <h1 className="text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tight text-white max-w-4xl">
-          MD FAHIM <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500">PRODHAN</span>
+        <h1 className=" text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-wider text-white max-w-4xl">
+          Mahbub Alam <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500">Abid</span>
         </h1>
 
         {/* Roles & Tagline */}
         <p className="mt-4 text-base sm:text-xl md:text-2xl text-zinc-300 max-w-2xl font-light leading-relaxed">
-          Full Stack Developer & Web Instructor building scalable <span className="text-white font-medium">Multi-Tenant SaaS</span> and high-performance interactive web apps.
+          <span className="text-white font-bold">Full Stack Web Engineer</span> <br />
+          <span className="font-extralight text-[20px]">
+            Building modern web experiences with React and Next.js.
+          </span>
         </p>
 
         {/* Quick Tech Badges */}
-        <div className="mt-6 flex flex-wrap justify-center gap-2 max-w-xl">
-          {["React 19", "Node.js", "Multi-Tenant SaaS", "Tailwind CSS", "GSAP"].map((tag) => (
+        <div className="mt-6 flex flex-wrap justify-center gap-2 max-w-xl font-bold">
+          {["React 19", "Node.js", "JavaScript", "Tailwind CSS", "TypeScript"].map((tag) => (
             <span
               key={tag}
-              className="text-[11px] sm:text-xs px-3 py-1 rounded-full bg-black/40 border border-white/10 text-zinc-400"
+              className={`text-[11px] sm:text-xs px-3 py-1 rounded-full bg-black/40 border text-zinc-400 ${
+                tag === "JavaScript" ? "border-cyan-400" : "border-white/10"
+              }`}
             >
               {tag}
             </span>

@@ -7,7 +7,7 @@ import StatsSection from "./components/StatsSection";
 import ExperienceSection from "./components/ExperienceSection";
 import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
-import ServicesSection from "./components/ServicesSection";
+// import ServicesSection from "./components/ServicesSection";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 
@@ -28,12 +28,12 @@ export default function App() {
         {/* 2. Key Metrics & Impact */}
         <StatsSection />
 
-        {/* 3. Work Experience & Leadership */}
+        {/* 3. Work Experience */}
         <ExperienceSection />
 
         {/* 4. About Canvas Sequence (Moved after Work Experience) */}
         <div id="about" className="relative">
-          <ScrollSequence name="about" frameCount={96} scrollLength={3500}>
+          <ScrollSequence name="about" frameCount={144} scrollLength={3500}>
             {(progress) => <AboutContent progress={progress} />}
           </ScrollSequence>
         </div>
@@ -44,8 +44,8 @@ export default function App() {
         {/* 6. Featured Projects */}
         <ProjectsSection />
 
-        {/* 7. Solutions & Services */}
-        <ServicesSection />
+        {/* 7. Solutions & Services (Temporarily Disabled) */}
+        {/* <ServicesSection /> */}
 
         {/* 8. Contact & Inquiry */}
         <ContactSection />

@@ -3,52 +3,36 @@ import { Briefcase, Calendar, MapPin, CheckCircle2, ArrowDown } from "lucide-rea
 export default function ExperienceSection() {
   const experiences = [
     {
-      role: "Lead Full-Stack Developer",
-      company: "SaaS & Cloud Solutions",
-      period: "2024 - Present",
-      location: "Bangladesh / Remote",
-      badge: "Full-Stack Architecture",
+      role: "Full Stack Web Development",
+      company: "Personal Projects & Continuous Learning",
+      period: "2026 – Present",
+      location: "Dhaka, Bangladesh",
+      badge: "Self-Directed Learning",
       badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
       description:
-        "Leading the development of modern cloud software and multi-tenant SaaS ecosystems. Overseeing end-to-end architecture, from data isolation models to rich interactive user experiences.",
+        "Learning modern web development by building small projects and applying programming concepts in practice. Currently developing skills in frontend technologies and exploring full-stack application development.",
       achievements: [
-        "Architected multi-tenant SaaS frameworks with isolated databases and role-based permissions.",
-        "Built client lead management pipelines with automated exports and real-time activity metrics.",
-        "Engineered smooth, modern interfaces using React 19, Tailwind CSS, and state-of-the-art animations.",
+        "Learning and practising HTML, CSS, JavaScript, and TypeScript.",
+        "Building small projects using React and Next.js to strengthen practical development skills.",
+        "Exploring Tailwind CSS to create responsive and maintainable user interfaces.",
       ],
-      skills: ["Multi-Tenant SaaS", "React 19", "Node.js", "Express", "System Design", "MongoDB"],
+      skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS"],
     },
     {
-      role: "Web Development Instructor & Mentor",
-      company: "Tech Community & Conceptual Sessions",
-      period: "2024 - Present",
-      location: "Online / Bangladesh",
-      badge: "Education & Leadership",
+      role: "BSc in Computer Science and Engineering",
+      company: "Bangladesh University of Business and Technology (BUBT)",
+      period: "Expected 2027",
+      location: "Bangladesh",
+      badge: "Education",
       badgeColor: "bg-teal-500/10 text-teal-400 border-teal-500/30",
       description:
-        "Conducting in-depth conceptual sessions and mentorship programs for aspiring software engineers. Guiding students through modern JavaScript concepts, React patterns, and full-stack project building.",
+        "Currently pursuing a Bachelor of Science in Computer Science and Engineering, developing foundational knowledge in computing, programming, and software development.",
       achievements: [
-        "Conducted targeted conceptual sessions breaking down complex frontend and backend concepts.",
-        "Mentored dozens of students in code quality, debugging techniques, and Git workflows.",
-        "Reviewed student codebases and provided actionable architectural feedback.",
+        "Computer science and programming fundamentals.",
+        "Software development concepts and practical coding.",
+        "Applying academic knowledge through personal programming projects.",
       ],
-      skills: ["React", "JavaScript", "Instruction", "Code Reviews", "Mentorship", "Git"],
-    },
-    {
-      role: "Full Stack Web Developer",
-      company: "Independent Projects & Open Source",
-      period: "2023 - Present",
-      location: "Remote",
-      badge: "Engineering",
-      badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-      description:
-        "Building interactive, performant web applications with responsive design and modern UX practices. Developing full-stack solutions with clean code architecture and optimized data flow.",
-      achievements: [
-        "Created StudyFlow, a comprehensive task and study management suite with interactive visual charts.",
-        "Developed a multi-tenant library management system with real-time borrowing logs and book catalogs.",
-        "Designed high-performance canvas scroll animations using Lenis and GSAP ScrollTrigger.",
-      ],
-      skills: ["React", "Tailwind CSS", "REST APIs", "GSAP", "Lenis", "Node.js"],
+      skills: [],
     },
   ];
 
@@ -65,10 +49,10 @@ export default function ExperienceSection() {
             Career & Journey
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-            Work Experience & <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">Leadership</span>
+            Work <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-300">Experience</span>
           </h2>
           <p className="mt-4 text-base sm:text-lg text-zinc-400">
-            A track record of founding tech initiatives, mentoring the next generation of engineers, and engineering scalable web applications.
+            My journey in software development, hands-on learning, and computer science education.
           </p>
         </div>
 
@@ -125,16 +109,28 @@ export default function ExperienceSection() {
                     </div>
 
                     {/* Tech Badges */}
-                    <div className="mt-6 pt-5 border-t border-white/5 flex flex-wrap gap-1.5">
-                      {exp.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="text-[11px] px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                    {exp.skills && exp.skills.length > 0 && (
+                      <div className="mt-6 pt-5 border-t border-white/5 flex flex-wrap gap-1.5">
+                        {exp.skills.map((skill) => {
+                          const isHighlighted =
+                            exp.role === "Full Stack Web Development" &&
+                            ["HTML", "JavaScript", "React", "Tailwind CSS"].includes(skill);
+
+                          return (
+                            <span
+                              key={skill}
+                              className={`text-[11px] px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5 transition-all duration-300 ${
+                                isHighlighted
+                                  ? "group-hover:bg-cyan-500/10 group-hover:border-cyan-500/30 group-hover:text-cyan-300"
+                                  : ""
+                              }`}
+                            >
+                              {skill}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 

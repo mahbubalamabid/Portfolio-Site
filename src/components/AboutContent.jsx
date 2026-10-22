@@ -2,17 +2,18 @@ import { motion, useTransform } from "motion/react";
 import { ArrowDown, Code2, Rocket } from "lucide-react";
 
 export default function AboutContent({ progress }) {
-  // First slide: Philosophy & Mission
-  const headOpacity = useTransform(progress, [0, 0.12, 0.35], [0, 1, 0]);
-  const headY = useTransform(progress, [0, 0.12, 0.35], [40, 0, -20]);
+  // First slide: Philosophy & Mission - visible on entering the section, stays readable, then transitions out
+  const headOpacity = useTransform(progress, [0, 0.22, 0.32], [1, 1, 0]);
+  const headY = useTransform(progress, [0, 0.22, 0.32], [0, 0, -30]);
 
-  // Second slide: Experience & Roles
-  const textOpacity = useTransform(progress, [0.38, 0.52, 0.78], [0, 1, 0]);
-  const textY = useTransform(progress, [0.38, 0.52, 0.78], [40, 0, -20]);
+  // Second slide: Experience & Roles - fades in, stays readable through middle progression, then transitions out
+  const textOpacity = useTransform(progress, [0.32, 0.42, 0.62, 0.72], [0, 1, 1, 0]);
+  const textY = useTransform(progress, [0.32, 0.42, 0.62, 0.72], [30, 0, 0, -30]);
 
-  // Final slide: Quick highlights & CTA
-  const endOpacity = useTransform(progress, [0.82, 0.94], [0, 1]);
-  const endY = useTransform(progress, [0.82, 0.94], [30, 0]);
+  // Final slide: Quick highlights & CTA - fades in and remains available for smooth transition to next section
+  const endOpacity = useTransform(progress, [0.72, 0.82], [0, 1]);
+  const endY = useTransform(progress, [0.72, 0.82], [30, 0]);
+  const endPointerEvents = useTransform(progress, (v) => (v >= 0.72 ? "auto" : "none"));
 
   return (
     <>
@@ -57,7 +58,7 @@ export default function AboutContent({ progress }) {
 
       {/* Slide 3: Transition to Details */}
       <motion.div
-        style={{ opacity: endOpacity, y: endY }}
+        style={{ opacity: endOpacity, y: endY, pointerEvents: endPointerEvents }}
         className="absolute bottom-16 z-10 flex flex-col items-center justify-center w-full px-4"
       >
         <div className="text-center mb-5">
