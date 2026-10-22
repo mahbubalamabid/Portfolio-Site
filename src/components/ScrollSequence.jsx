@@ -12,6 +12,7 @@ export default function ScrollSequence({
   scrollLength = 4000,
   initialOverlayOpacity = 0.7,
   fadeEndProgress = 0.45,
+  mobileFocalX,
   children, // (progress) => JSX
 }) {
   const wrapRef = useRef(null);
@@ -98,7 +99,16 @@ export default function ScrollSequence({
       if (ir > cr) {
         h = canvas.height;
         w = h * ir;
-        x = (canvas.width - w) / 2;
+        // On mobile viewports (< 768px), align the visual subject (centered at ~38% across the 16:9 frame for hero)
+        // rather than using 50% image center which pushes the person against the left screen edge.
+        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+        const focalX = isMobile
+          ? (mobileFocalX !== undefined ? mobileFocalX : name === "hero" ? 0.38 : 0.5)
+          : 0.5;
+        const targetX = canvas.width * 0.5 - w * focalX;
+        const minX = canvas.width - w;
+        const maxX = 0;
+        x = Math.min(maxX, Math.max(minX, targetX));
         y = 0;
       } else {
         w = canvas.width;
@@ -110,7 +120,7 @@ export default function ScrollSequence({
       ctx.drawImage(imgToDraw, x, y, w, h);
       lastDrawnFrameRef.current = clampedIndex;
     },
-    [frameCount]
+    [frameCount, mobileFocalX, name]
   );
 
   const rawBase = import.meta.env.BASE_URL || "/";
@@ -290,7 +300,9 @@ export default function ScrollSequence({
             loop
             muted
             playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-60"
+            className={`absolute inset-0 h-full w-full object-cover opacity-60 ${
+              name === "hero" ? "object-[38%_center] md:object-center" : "object-center"
+            }`}
             src={`${baseUrl}${name}.mp4`}
             onError={(e) => {
               e.currentTarget.style.display = "none";
