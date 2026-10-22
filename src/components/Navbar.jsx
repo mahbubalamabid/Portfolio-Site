@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, Mail, Download } from "lucide-react";
 import { GithubIcon } from "./Icons";
 import signatureImg from "../assets/signature.png";
@@ -26,8 +26,18 @@ export default function Navbar() {
     return "";
   });
 
+  const scrolledRef = useRef(false);
+  const activeSectionRef = useRef(activeSection);
+
   useEffect(() => {
     let ticking = false;
+
+    const setSectionIfChanged = (newSection) => {
+      if (activeSectionRef.current !== newSection) {
+        activeSectionRef.current = newSection;
+        setActiveSection(newSection);
+      }
+    };
 
     const updateActiveSection = () => {
       const scrollPosition = window.scrollY;
@@ -36,18 +46,18 @@ export default function Navbar() {
 
       // When near the very bottom of the page, activate Contact
       if (scrollPosition + windowHeight >= documentHeight - 60) {
-        setActiveSection("#contact");
+        setSectionIfChanged("#contact");
         return;
       }
 
       // Check if user is at Hero section (above Experience)
-      const expEl = document.querySelector("#experience");
+      const expEl = document.getElementById("experience");
       const threshold = 180;
 
       if (expEl) {
         const expRect = expEl.getBoundingClientRect();
         if (expRect.top > threshold && scrollPosition < 350) {
-          setActiveSection("");
+          setSectionIfChanged("");
           return;
         }
       }
@@ -55,11 +65,12 @@ export default function Navbar() {
       const activeNavItems = navLinks.map((link) => link.href);
 
       for (const href of activeNavItems) {
-        const el = document.querySelector(href);
+        const id = href.replace("#", "");
+        const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= threshold && rect.bottom > threshold) {
-            setActiveSection(href);
+            setSectionIfChanged(href);
             return;
           }
         }
@@ -68,11 +79,12 @@ export default function Navbar() {
       // Fallback: check which section has its top above threshold and still visible
       for (let i = activeNavItems.length - 1; i >= 0; i--) {
         const href = activeNavItems[i];
-        const el = document.querySelector(href);
+        const id = href.replace("#", "");
+        const el = document.getElementById(id);
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= threshold && rect.bottom > 0) {
-            setActiveSection(href);
+            setSectionIfChanged(href);
             return;
           }
         }
@@ -80,7 +92,11 @@ export default function Navbar() {
     };
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      const isScrolled = window.scrollY > 50;
+      if (isScrolled !== scrolledRef.current) {
+        scrolledRef.current = isScrolled;
+        setScrolled(isScrolled);
+      }
 
       if (!ticking) {
         window.requestAnimationFrame(() => {
@@ -93,7 +109,7 @@ export default function Navbar() {
 
     const handleHashChange = () => {
       if (window.location.hash) {
-        setActiveSection(window.location.hash);
+        setSectionIfChanged(window.location.hash);
       }
     };
 

@@ -2,7 +2,6 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     color-scheme: dark;
   }
 
@@ -60,4 +59,25 @@
   background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 50%, #06b6d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Official Lenis integration rules: prevents browser native smooth-scroll from conflicting with Lenis RAF loop */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }

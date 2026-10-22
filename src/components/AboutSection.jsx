@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   Code2,
@@ -11,70 +11,126 @@ import {
   Compass,
 } from "lucide-react";
 
+// Passive window scroll tracking to suppress expensive mouse tilt/spotlight updates during active window scrolling
+let isWindowScrolling = false;
+let scrollTimeoutId = null;
+
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "scroll",
+    () => {
+      isWindowScrolling = true;
+      document.documentElement.classList.add("is-scrolling");
+      if (scrollTimeoutId) clearTimeout(scrollTimeoutId);
+      scrollTimeoutId = setTimeout(() => {
+        isWindowScrolling = false;
+        document.documentElement.classList.remove("is-scrolling");
+      }, 100);
+    },
+    { passive: true }
+  );
+}
+
 /**
- * React Bits-Inspired DepthCard Component
+ * React Bits-Inspired DepthCard Component (Optimized)
  * Implements mouse-responsive 3D tilt, dynamic radial spotlight glow,
  * and illuminated cursor-following border highlights.
+ * Uses requestAnimationFrame and direct DOM updates for 60/120fps performance with zero React re-renders.
  * Gracefully disabled on touch devices and for users who prefer reduced motion.
  */
 function DepthCard({ children, className = "", tiltIntensity = 5 }) {
   const cardRef = useRef(null);
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, opacity: 0 });
-  const [isTouchDevice] = useState(() => {
-    if (typeof window !== "undefined") {
-      return "ontouchstart" in window || (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
-    }
-    return false;
-  });
+  const spotlightRef = useRef(null);
+  const borderGlowRef = useRef(null);
+  const rafRef = useRef(null);
+  const rectRef = useRef(null);
+  const isHoveredRef = useRef(false);
+
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || (typeof navigator !== "undefined" && navigator.maxTouchPoints > 0));
   const shouldReduceMotion = useReducedMotion();
 
-  const handleMouseMove = (e) => {
+  const handleMouseEnter = () => {
     if (isTouchDevice || shouldReduceMotion || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
+    isHoveredRef.current = true;
+    rectRef.current = cardRef.current.getBoundingClientRect();
+  };
+
+  const handleMouseMove = (e) => {
+    if (isTouchDevice || shouldReduceMotion || !cardRef.current || isWindowScrolling) return;
+
+    // Use cached card dimensions during hover to eliminate layout reflows on every mousemove
+    let rect = rectRef.current;
+    if (!rect) {
+      rect = cardRef.current.getBoundingClientRect();
+      rectRef.current = rect;
+    }
+
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
     const nx = (x / rect.width - 0.5) * 2;
     const ny = (y / rect.height - 0.5) * 2;
+    const rotX = -ny * tiltIntensity;
+    const rotY = nx * tiltIntensity;
 
-    setRotate({
-      x: -ny * tiltIntensity,
-      y: nx * tiltIntensity,
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      if (!cardRef.current || !isHoveredRef.current) return;
+      cardRef.current.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg)`;
+      cardRef.current.style.transition = "transform 0.1s ease-out";
+      if (spotlightRef.current) {
+        spotlightRef.current.style.opacity = "1";
+        // Hardware-accelerated GPU translate3d positioning — avoids CSS string re-parsing and repainting
+        spotlightRef.current.style.transform = `translate3d(${(x - 225).toFixed(1)}px, ${(y - 225).toFixed(1)}px, 0)`;
+      }
+      if (borderGlowRef.current) {
+        borderGlowRef.current.style.opacity = "1";
+      }
     });
-    setSpotlight({ x, y, opacity: 1 });
   };
 
   const handleMouseLeave = () => {
-    setRotate({ x: 0, y: 0 });
-    setSpotlight((prev) => ({ ...prev, opacity: 0 }));
+    isHoveredRef.current = false;
+    rectRef.current = null;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    const cardEl = cardRef.current;
+    if (!cardEl) return;
+    cardEl.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+    cardEl.style.transition = "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)";
+    if (spotlightRef.current) {
+      spotlightRef.current.style.opacity = "0";
+    }
+    if (borderGlowRef.current) {
+      borderGlowRef.current.style.opacity = "0";
+    }
+    const cleanupTransform = (e) => {
+      if (e.propertyName === "transform" && !isHoveredRef.current) {
+        cardEl.style.transform = "";
+        cardEl.removeEventListener("transitionend", cleanupTransform);
+      }
+    };
+    cardEl.addEventListener("transitionend", cleanupTransform);
   };
 
   return (
     <div
       ref={cardRef}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{
-        transformStyle: "preserve-3d",
-        transform:
-          !isTouchDevice && !shouldReduceMotion
-            ? `perspective(1000px) rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`
-            : "none",
-        transition:
-          spotlight.opacity === 0
-            ? "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)"
-            : "transform 0.1s ease-out",
-      }}
       className={`relative rounded-3xl overflow-hidden bg-zinc-900/60 border border-white/10 backdrop-blur-xl transition-colors duration-300 group hover:border-cyan-400/40 hover:bg-zinc-900/85 ${className}`}
     >
-      {/* React Bits: Dynamic Spotlight Glow following cursor */}
+      {/* React Bits: Dynamic Spotlight Glow following cursor (GPU translate3d accelerated, zero React re-renders) */}
       {!isTouchDevice && !shouldReduceMotion && (
         <div
-          className="pointer-events-none absolute -inset-px transition-opacity duration-300 z-10"
+          ref={spotlightRef}
+          className="pointer-events-none absolute w-[450px] h-[450px] rounded-full opacity-0 transition-opacity duration-300 z-10"
           style={{
-            opacity: spotlight.opacity,
-            background: `radial-gradient(450px circle at ${spotlight.x}px ${spotlight.y}px, rgba(34, 211, 238, 0.14), transparent 80%)`,
+            background: "radial-gradient(circle, rgba(34, 211, 238, 0.14) 0%, transparent 80%)",
+            transform: "translate3d(-9999px, -9999px, 0)",
+            willChange: "transform",
           }}
           aria-hidden="true"
         />
@@ -83,11 +139,8 @@ function DepthCard({ children, className = "", tiltIntensity = 5 }) {
       {/* Subtle border highlight following cursor */}
       {!isTouchDevice && !shouldReduceMotion && (
         <div
-          className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300 z-10"
-          style={{
-            opacity: spotlight.opacity,
-            boxShadow: `inset 0 0 0 1px rgba(34, 211, 238, 0.25)`,
-          }}
+          ref={borderGlowRef}
+          className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 z-10 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.25)]"
           aria-hidden="true"
         />
       )}
@@ -108,6 +161,26 @@ function DepthCard({ children, className = "", tiltIntensity = 5 }) {
  */
 export default function AboutSection() {
   const shouldReduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const [isSectionVisible, setIsSectionVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setIsSectionVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSectionVisible(entry.isIntersecting);
+      },
+      { rootMargin: "300px 0px" } // Pre-activate 300px before entering viewport
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Motion variants for coordinated scroll-triggered reveals
   const containerVariants = {
@@ -135,18 +208,38 @@ export default function AboutSection() {
         duration: 0.65,
         ease: [0.22, 1, 0.36, 1],
       },
+      // Release element from offscreen filter framebuffer after entrance animation completes
+      transitionEnd: {
+        filter: "none",
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: shouldReduceMotion ? 0 : 25,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.65,
+        ease: [0.22, 1, 0.36, 1],
+      },
     },
   };
 
   return (
     <section
+      ref={sectionRef}
       id="about"
       className="relative py-28 lg:py-36 bg-black text-white overflow-hidden border-t border-white/5"
     >
       {/* ========================================================
           REACT BITS BACKGROUND: Aurora Blur + Dot Shift Matrix Grid
           ======================================================== */}
-      {/* Dot Shift Matrix Grid */}
+      {/* Dot Shift Matrix Grid (Hardware-isolated static GPU layer) */}
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-25"
         style={{
@@ -154,18 +247,44 @@ export default function AboutSection() {
           backgroundSize: "28px 28px",
           maskImage: "radial-gradient(ellipse 65% 55% at 50% 50%, black 20%, transparent 85%)",
           WebkitMaskImage: "radial-gradient(ellipse 65% 55% at 50% 50%, black 20%, transparent 85%)",
+          transform: "translateZ(0)",
         }}
         aria-hidden="true"
       />
 
-      {/* Aurora Blur: Organic Floating Gradient Orbs */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      {/* Scoped scroll-pause optimization: prevents GPU backdrop filter invalidations during scrolling */}
+      <style>{`
+        .lenis-scrolling .about-pulse-orb,
+        html.is-scrolling .about-pulse-orb {
+          animation-play-state: paused !important;
+        }
+      `}</style>
+
+      {/* Aurora Blur: Organic Floating Gradient Orbs (GPU Layer-Isolated) */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+        style={{ transform: "translateZ(0)" }}
+        aria-hidden="true"
+      >
         {/* Cyan Orb (Top-Left) */}
-        <div className="absolute -top-32 -left-32 w-[550px] h-[550px] rounded-full bg-cyan-500/10 blur-[130px] animate-pulse" />
+        <div
+          className="about-pulse-orb absolute -top-32 -left-32 w-[550px] h-[550px] rounded-full bg-cyan-500/10 blur-[130px] animate-pulse"
+          style={{
+            transform: "translateZ(0)",
+            willChange: "opacity",
+            animationPlayState: isSectionVisible ? "running" : "paused",
+          }}
+        />
         {/* Teal / Emerald Orb (Bottom-Right) */}
-        <div className="absolute top-1/2 -right-40 w-[600px] h-[600px] rounded-full bg-teal-500/10 blur-[140px]" />
+        <div
+          className="absolute top-1/2 -right-40 w-[600px] h-[600px] rounded-full bg-teal-500/10 blur-[140px]"
+          style={{ transform: "translateZ(0)" }}
+        />
         {/* Deep Slate Center Accent */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[450px] rounded-full bg-blue-600/5 blur-[150px]" />
+        <div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[450px] rounded-full bg-blue-600/5 blur-[150px]"
+          style={{ transform: "translateZ(0)" }}
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -238,7 +357,7 @@ export default function AboutSection() {
           {/* Top Row: Hero Identity & Journey (7 cols) + Current Focus (5 cols) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* Card 1: Main Introduction Area & Programming Journey (Span 7 cols) */}
-            <motion.div variants={itemVariants} className="lg:col-span-7 flex flex-col">
+            <motion.div variants={cardVariants} className="lg:col-span-7 flex flex-col">
               <DepthCard className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between flex-1">
                 <div>
                   {/* Card Header & Simulated Terminal Bar */}
@@ -305,7 +424,7 @@ export default function AboutSection() {
             </motion.div>
 
             {/* Card 2: Current Focus & Career Direction (Span 5 cols) */}
-            <motion.div variants={itemVariants} className="lg:col-span-5 flex flex-col">
+            <motion.div variants={cardVariants} className="lg:col-span-5 flex flex-col">
               <DepthCard className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between flex-1 bg-gradient-to-br from-zinc-900/80 via-zinc-900/50 to-zinc-950/90">
                 <div>
                   {/* Badge */}
@@ -379,7 +498,7 @@ export default function AboutSection() {
           {/* Bottom Row: Work I Enjoy (6 cols) + Beyond Coding & Mindset (6 cols) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* Card 3: Work I Genuinely Enjoy (Span 6 cols) */}
-            <motion.div variants={itemVariants} className="lg:col-span-6 flex flex-col">
+            <motion.div variants={cardVariants} className="lg:col-span-6 flex flex-col">
               <DepthCard className="p-6 sm:p-8 flex flex-col justify-between flex-1">
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-6">
@@ -428,7 +547,7 @@ export default function AboutSection() {
             </motion.div>
 
             {/* Card 4: Beyond the Code & Engineering Mindset (Span 6 cols) */}
-            <motion.div variants={itemVariants} className="lg:col-span-6 flex flex-col">
+            <motion.div variants={cardVariants} className="lg:col-span-6 flex flex-col">
               <DepthCard className="p-6 sm:p-8 flex flex-col justify-between flex-1">
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-6">

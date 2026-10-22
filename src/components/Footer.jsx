@@ -2,11 +2,13 @@ import { ArrowUp, Mail } from "lucide-react";
 import { GithubIcon } from "./Icons";
 import signatureImg from "../assets/signature.png";
 
-const currentYear = new Date().getFullYear();
-
 export default function Footer() {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined" && window.__lenis) {
+      window.__lenis.scrollTo(0, { duration: 1.4 });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const navLinks = [

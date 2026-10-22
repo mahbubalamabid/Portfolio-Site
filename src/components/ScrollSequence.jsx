@@ -45,10 +45,17 @@ export default function ScrollSequence({
     ? initialOverlayOpacity * 0.75
     : dynamicOverlayOpacity;
 
+  // Cache mobile state via ref to avoid window.innerWidth layout thrashing on every RAF tick
+  const isMobileRef = useRef(
+    typeof window !== "undefined" && window.innerWidth < 768
+  );
+
   // Listen for window resize to adapt asset resolution (mobile vs desktop)
   useEffect(() => {
     const handleResize = () => {
-      const targetFolder = window.innerWidth < 768 ? `${name}-sm` : name;
+      const isMobile = window.innerWidth < 768;
+      isMobileRef.current = isMobile;
+      const targetFolder = isMobile ? `${name}-sm` : name;
       setFolder((prev) => (prev !== targetFolder ? targetFolder : prev));
     };
     window.addEventListener("resize", handleResize);
@@ -56,12 +63,15 @@ export default function ScrollSequence({
   }, [name]);
 
   const draw = useCallback(
-    (index) => {
+    (index, force = false) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
       const clampedIndex = Math.min(frameCount - 1, Math.max(0, Math.round(index)));
       targetFrameRef.current = clampedIndex;
+
+      // Skip redundant clear and redraw if the exact same frame is already active
+      if (!force && lastDrawnFrameRef.current === clampedIndex) return;
 
       const img = imagesRef.current[clampedIndex];
       let imgToDraw = img && img.complete && img.naturalWidth && img.naturalHeight ? img : null;
@@ -104,7 +114,7 @@ export default function ScrollSequence({
         // - About: starts at 0.68 (frames the developer's head, face, and upper body naturally on the right,
         //   giving comfortable room for the text on the left), then smoothly transitions to 0.50
         //   between frames 30 and 85 as the camera zooms into the centered laptop code screen.
-        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+        const isMobile = isMobileRef.current;
         let focalX = 0.5;
         if (isMobile) {
           if (typeof mobileFocalX === "function") {
@@ -251,7 +261,7 @@ export default function ScrollSequence({
             canvas.height = targetH;
           }
         }
-        draw(targetFrameRef.current);
+        draw(targetFrameRef.current, true);
       };
 
       resize(true);
