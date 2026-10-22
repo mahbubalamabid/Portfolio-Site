@@ -161,6 +161,10 @@ export default function ScrollSequence({
         // or if no frame has ever been rendered to the canvas yet.
         if (targetFrameRef.current === i || lastDrawnFrameRef.current === -1) {
           draw(targetFrameRef.current);
+          setStatus((prev) => (prev === "loading" ? "ready" : prev));
+          if (name === "hero" && typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("portfolio:hero-ready"));
+          }
         }
         checkCompletion();
       };

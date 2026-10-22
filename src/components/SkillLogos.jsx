@@ -38,6 +38,7 @@ export function SkillLogo({ name, className = "w-5 h-5" }) {
         </svg>
       );
 
+    case "React":
     case "React.js":
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">

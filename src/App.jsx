@@ -1,9 +1,11 @@
+import InitialLoadingScreen from "./components/InitialLoadingScreen";
 import SmoothScroll from "./components/SmoothScroll";
 import ScrollSequence from "./components/ScrollSequence";
 import HeroContent from "./components/HeroContent";
 import AboutContent from "./components/AboutContent";
 import Navbar from "./components/Navbar";
 import StatsSection from "./components/StatsSection";
+import TechStackLoop from "./components/TechStackLoop";
 import ExperienceSection from "./components/ExperienceSection";
 import SkillsSection from "./components/SkillsSection";
 import ProjectsSection from "./components/ProjectsSection";
@@ -13,9 +15,11 @@ import Footer from "./components/Footer";
 
 export default function App() {
   return (
-    <SmoothScroll>
-      <div className="relative bg-black text-white selection:bg-cyan-400 selection:text-black">
-        {/* Navigation Bar */}
+    <>
+      <InitialLoadingScreen />
+      <SmoothScroll>
+        <div className="relative bg-black text-white selection:bg-cyan-400 selection:text-black">
+          {/* Navigation Bar */}
         <Navbar />
 
         {/* 1. Hero Canvas Sequence */}
@@ -27,6 +31,9 @@ export default function App() {
 
         {/* 2. Key Metrics & Impact */}
         <StatsSection />
+
+        {/* Tech Stack LogoLoop Strip */}
+        <TechStackLoop />
 
         {/* 3. Work Experience */}
         <ExperienceSection />
@@ -54,5 +61,6 @@ export default function App() {
         <Footer />
       </div>
     </SmoothScroll>
+    </>
   );
 }
