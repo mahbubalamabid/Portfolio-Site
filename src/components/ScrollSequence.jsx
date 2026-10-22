@@ -99,13 +99,33 @@ export default function ScrollSequence({
       if (ir > cr) {
         h = canvas.height;
         w = h * ir;
-        // On mobile viewports (< 768px), align the visual subject (centered at ~43.5% across the 16:9 frame for hero)
-        // rather than using 50% image center (which pushes the subject against the left edge in profile poses)
-        // or 38% (which over-corrects and severely pushes the subject against the right edge in forward-facing poses).
+        // On mobile viewports (< 768px), align the visual subject centered on canvas:
+        // - Hero: 0.435 (keeps head within ±4% of screen center across all frames).
+        // - About: starts at 0.68 (frames the developer's head, face, and upper body naturally on the right,
+        //   giving comfortable room for the text on the left), then smoothly transitions to 0.50
+        //   between frames 30 and 85 as the camera zooms into the centered laptop code screen.
         const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-        const focalX = isMobile
-          ? (mobileFocalX !== undefined ? mobileFocalX : name === "hero" ? 0.435 : 0.5)
-          : 0.5;
+        let focalX = 0.5;
+        if (isMobile) {
+          if (typeof mobileFocalX === "function") {
+            const progressRatio = frameCount > 1 ? clampedIndex / (frameCount - 1) : 0;
+            focalX = mobileFocalX(progressRatio, clampedIndex);
+          } else if (typeof mobileFocalX === "number") {
+            focalX = mobileFocalX;
+          } else if (name === "hero") {
+            focalX = 0.435;
+          } else if (name === "about") {
+            if (clampedIndex <= 30) {
+              focalX = 0.68;
+            } else if (clampedIndex >= 85) {
+              focalX = 0.50;
+            } else {
+              const t = (clampedIndex - 30) / (85 - 30);
+              const ease = t * t * (3 - 2 * t);
+              focalX = 0.68 + (0.50 - 0.68) * ease;
+            }
+          }
+        }
         const targetX = canvas.width * 0.5 - w * focalX;
         const minX = canvas.width - w;
         const maxX = 0;
@@ -302,7 +322,11 @@ export default function ScrollSequence({
             muted
             playsInline
             className={`absolute inset-0 h-full w-full object-cover opacity-60 ${
-              name === "hero" ? "object-[43.5%_center] md:object-center" : "object-center"
+              name === "hero"
+                ? "object-[43.5%_center] md:object-center"
+                : name === "about"
+                ? "object-[68%_center] md:object-center"
+                : "object-center"
             }`}
             src={`${baseUrl}${name}.mp4`}
             onError={(e) => {
