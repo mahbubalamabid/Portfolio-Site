@@ -31,7 +31,7 @@ export default function Footer() {
                 className="h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(34,211,238,0.3)]"
               />
             </div>
-            
+
           </div>
 
           {/* Quick Navigation */}

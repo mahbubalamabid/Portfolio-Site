@@ -63,9 +63,8 @@ export default function ExperienceSection() {
             return (
               <div
                 key={idx}
-                className={`flex flex-col md:flex-row gap-8 items-start ${
-                  isEven ? "md:flex-row-reverse" : ""
-                }`}
+                className={`flex flex-col md:flex-row gap-8 items-start ${isEven ? "md:flex-row-reverse" : ""
+                  }`}
               >
                 {/* Content Card */}
                 <div className="w-full md:w-[calc(50%-2rem)]">
@@ -119,11 +118,10 @@ export default function ExperienceSection() {
                           return (
                             <span
                               key={skill}
-                              className={`text-[11px] px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5 transition-all duration-300 ${
-                                isHighlighted
+                              className={`text-[11px] px-2.5 py-1 rounded-md bg-white/5 text-zinc-300 border border-white/5 transition-all duration-300 ${isHighlighted
                                   ? "group-hover:bg-cyan-500/10 group-hover:border-cyan-500/30 group-hover:text-cyan-300"
                                   : ""
-                              }`}
+                                }`}
                             >
                               {skill}
                             </span>

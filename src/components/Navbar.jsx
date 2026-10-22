@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Mail, ArrowUpRight } from "lucide-react";
+import { Menu, X, Mail, Download } from "lucide-react";
 import { GithubIcon } from "./Icons";
 import signatureImg from "../assets/signature.png";
 
@@ -11,6 +11,10 @@ const navLinks = [
   // { name: "Services", href: "#services" },
   { name: "Contact", href: "#contact" },
 ];
+
+const rawBase = import.meta.env.BASE_URL || "/";
+const baseUrl = rawBase.endsWith("/") ? rawBase : `${rawBase}/`;
+const resumeHref = `${baseUrl}Mahbub_Alam_Abid_Resume.pdf`;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -123,11 +127,10 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
             ? "bg-black/85 backdrop-blur-md border-b border-white/10 py-2.5 sm:py-3 shadow-lg shadow-black/50"
             : "bg-transparent py-3 sm:py-5"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -168,11 +171,10 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className={`px-3.5 py-1.5 text-xs lg:text-sm rounded-full transition-all duration-300 ${
-                      isActive
+                    className={`px-3.5 py-1.5 text-xs lg:text-sm rounded-full transition-all duration-300 ${isActive
                         ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
                         : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     {link.name}
                   </a>
@@ -194,12 +196,14 @@ export default function Navbar() {
               </a>
 
               <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, "#contact")}
-                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-cyan-400 text-black text-xs lg:text-sm font-semibold px-4 py-2 rounded-full hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all"
+                href={resumeHref}
+                download="Mahbub_Alam_Abid_Resume.pdf"
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-cyan-400 text-black text-xs lg:text-sm font-semibold px-4 py-2 rounded-full hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all cursor-pointer whitespace-nowrap"
+                title="Download Resume"
+                aria-label="Download Resume"
               >
-                Let's Talk
-                <ArrowUpRight className="w-4 h-4" />
+                <span>Resume</span>
+                <Download className="w-4 h-4 shrink-0" />
               </a>
             </div>
 
@@ -238,11 +242,10 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className={`px-4 py-2.5 text-sm rounded-xl transition-all duration-300 min-h-[44px] flex items-center ${
-                      isActive
+                    className={`px-4 py-2.5 text-sm rounded-xl transition-all duration-300 min-h-[44px] flex items-center ${isActive
                         ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
                         : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     {link.name}
                   </a>

@@ -321,13 +321,12 @@ export default function ScrollSequence({
             loop
             muted
             playsInline
-            className={`absolute inset-0 h-full w-full object-cover opacity-60 ${
-              name === "hero"
+            className={`absolute inset-0 h-full w-full object-cover opacity-60 ${name === "hero"
                 ? "object-[43.5%_center] md:object-center"
                 : name === "about"
-                ? "object-[68%_center] md:object-center"
-                : "object-center"
-            }`}
+                  ? "object-[68%_center] md:object-center"
+                  : "object-center"
+              }`}
             src={`${baseUrl}${name}.mp4`}
             onError={(e) => {
               e.currentTarget.style.display = "none";
@@ -363,4 +362,4 @@ export default function ScrollSequence({
       {children?.(progress)}
     </section>
   );
-}
+}

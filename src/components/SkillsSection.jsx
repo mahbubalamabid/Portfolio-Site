@@ -199,11 +199,10 @@ export default function SkillsSection() {
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id)}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                  activeCategory === cat.id
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${activeCategory === cat.id
                     ? "bg-cyan-400 text-black shadow-lg shadow-cyan-400/25 scale-105"
                     : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10"
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -213,11 +212,10 @@ export default function SkillsSection() {
 
         {/* Skill Groups Grid */}
         <div
-          className={`grid gap-8 ${
-            displayedGroups.length === 1
+          className={`grid gap-8 ${displayedGroups.length === 1
               ? "grid-cols-1 max-w-4xl mx-auto"
               : "grid-cols-1 md:grid-cols-2"
-          }`}
+            }`}
         >
           {displayedGroups.map((group, idx) => {
             const Icon = group.icon;
@@ -241,23 +239,22 @@ export default function SkillsSection() {
                 </div>
 
                 <div
-                  className={`grid gap-3.5 ${
-                    displayedGroups.length === 1
+                  className={`grid gap-3.5 ${displayedGroups.length === 1
                       ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                       : "grid-cols-1 sm:grid-cols-2"
-                  }`}
+                    }`}
                 >
                   {group.skills.map((skill, sIdx) => {
                     const statusBadgeClass =
                       skill.status === "Practising"
                         ? "bg-cyan-500/10 text-cyan-300 border-cyan-500/20"
                         : skill.status === "Learning"
-                        ? "bg-teal-500/10 text-teal-300 border-teal-500/20"
-                        : skill.status === "Exploring"
-                        ? "bg-purple-500/10 text-purple-300 border-purple-500/20"
-                        : skill.status === "Projects"
-                        ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
-                        : "";
+                          ? "bg-teal-500/10 text-teal-300 border-teal-500/20"
+                          : skill.status === "Exploring"
+                            ? "bg-purple-500/10 text-purple-300 border-purple-500/20"
+                            : skill.status === "Projects"
+                              ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                              : "";
 
                     return (
                       <div

@@ -81,11 +81,10 @@ export default function ProjectsSection() {
               <button
                 key={btn.id}
                 onClick={() => setFilter(btn.id)}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                  filter === btn.id
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${filter === btn.id
                     ? "bg-cyan-400 text-black shadow-lg shadow-cyan-400/25 scale-105"
                     : "bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10"
-                }`}
+                  }`}
               >
                 {btn.label}
               </button>
@@ -148,11 +147,10 @@ export default function ProjectsSection() {
                           <button
                             type="button"
                             onClick={() => togglePreview(project.id)}
-                            className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                              isPreview
+                            className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${isPreview
                                 ? "bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-sm shadow-cyan-500/20"
                                 : "bg-white/5 text-zinc-300 hover:text-white hover:bg-white/10 border-white/10"
-                            }`}
+                              }`}
                             title={isPreview ? "Show project details" : "Show application preview"}
                             aria-label={isPreview ? "Show project details" : "Show application preview"}
                             aria-pressed={isPreview}
@@ -205,11 +203,10 @@ export default function ProjectsSection() {
                     <div className="relative flex-1 p-4 min-[360px]:p-6 sm:p-8 flex flex-col justify-between overflow-hidden min-h-[300px] sm:min-h-[360px]">
                       {/* State A: Detailed Project Information */}
                       <div
-                        className={`flex flex-col justify-between h-full space-y-6 motion-safe:transition-all duration-300 ease-in-out ${
-                          isPreview
+                        className={`flex flex-col justify-between h-full space-y-6 motion-safe:transition-all duration-300 ease-in-out ${isPreview
                             ? "opacity-0 pointer-events-none scale-[0.98] invisible"
                             : "opacity-100 pointer-events-auto scale-100 visible"
-                        }`}
+                          }`}
                         aria-hidden={isPreview}
                       >
                         <div>
@@ -246,11 +243,10 @@ export default function ProjectsSection() {
 
                       {/* State B: Application Visual Preview */}
                       <div
-                        className={`absolute inset-0 p-6 sm:p-8 flex flex-col justify-center items-center motion-safe:transition-all duration-300 ease-in-out ${
-                          isPreview
+                        className={`absolute inset-0 p-6 sm:p-8 flex flex-col justify-center items-center motion-safe:transition-all duration-300 ease-in-out ${isPreview
                             ? "opacity-100 pointer-events-auto scale-100 visible"
                             : "opacity-0 pointer-events-none scale-[0.98] invisible"
-                        }`}
+                          }`}
                         aria-hidden={!isPreview}
                       >
                         <div className="relative w-full h-full rounded-2xl overflow-hidden border border-cyan-500/20 bg-zinc-950/90 shadow-2xl flex flex-col justify-between">

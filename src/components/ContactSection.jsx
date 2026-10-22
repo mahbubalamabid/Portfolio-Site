@@ -330,11 +330,10 @@ export default function ContactSection() {
                         placeholder="e.g. John Doe"
                         aria-invalid={!!fieldErrors.name}
                         aria-describedby={fieldErrors.name ? "contact-name-error" : undefined}
-                        className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${
-                          fieldErrors.name
+                        className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${fieldErrors.name
                             ? "border-red-500/50 focus:border-red-400"
                             : "border-white/10 focus:border-cyan-400"
-                        }`}
+                          }`}
                       />
                       {fieldErrors.name && (
                         <p id="contact-name-error" className="text-[11px] text-red-400 mt-1">
@@ -358,11 +357,10 @@ export default function ContactSection() {
                         placeholder="john@example.com"
                         aria-invalid={!!fieldErrors.email}
                         aria-describedby={fieldErrors.email ? "contact-email-error" : undefined}
-                        className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${
-                          fieldErrors.email
+                        className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${fieldErrors.email
                             ? "border-red-500/50 focus:border-red-400"
                             : "border-white/10 focus:border-cyan-400"
-                        }`}
+                          }`}
                       />
                       {fieldErrors.email && (
                         <p id="contact-email-error" className="text-[11px] text-red-400 mt-1">
@@ -387,11 +385,10 @@ export default function ContactSection() {
                       placeholder="Project inquiry, collaboration, or opportunity"
                       aria-invalid={!!fieldErrors.subject}
                       aria-describedby={fieldErrors.subject ? "contact-subject-error" : undefined}
-                      className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${
-                        fieldErrors.subject
+                      className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm ${fieldErrors.subject
                           ? "border-red-500/50 focus:border-red-400"
                           : "border-white/10 focus:border-cyan-400"
-                      }`}
+                        }`}
                     />
                     {fieldErrors.subject && (
                       <p id="contact-subject-error" className="text-[11px] text-red-400 mt-1">
@@ -415,11 +412,10 @@ export default function ContactSection() {
                       placeholder="Tell me about your project, idea, or opportunity..."
                       aria-invalid={!!fieldErrors.message}
                       aria-describedby={fieldErrors.message ? "contact-message-error" : undefined}
-                      className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm resize-none ${
-                        fieldErrors.message
+                      className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-white placeholder-zinc-600 focus:outline-none transition-colors text-sm resize-none ${fieldErrors.message
                           ? "border-red-500/50 focus:border-red-400"
                           : "border-white/10 focus:border-cyan-400"
-                      }`}
+                        }`}
                     />
                     {fieldErrors.message && (
                       <p id="contact-message-error" className="text-[11px] text-red-400 mt-1">

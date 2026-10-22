@@ -1,4 +1,5 @@
 import { Layers, Users, Code, Sparkles } from "lucide-react";
+import CountUp from "./CountUp";
 
 export default function StatsSection() {
   const stats = [
@@ -11,12 +12,19 @@ export default function StatsSection() {
     {
       icon: Code,
       value: "2+ Projects",
+      countTo: 2,
+      suffix: "+",
+      trailingText: "Projects",
+      duration: 1.8,
       label: "Hands-on Development",
       desc: "Practising web development by building small projects with modern technologies.",
     },
     {
       icon: Users,
       value: "7 +",
+      countTo: 7,
+      suffix: "+",
+      duration: 2.2,
       label: "Current Learning Stack",
       desc: "HTML, CSS, JavaScript, TypeScript, React, Next.js and Tailwind CSS.",
     },
@@ -44,7 +52,16 @@ export default function StatsSection() {
                   <Icon className="w-6 h-6" />
                 </div>
                 <div className="text-3xl font-extrabold text-white tracking-tight group-hover:text-cyan-300 transition-colors">
-                  {stat.value}
+                  {stat.countTo !== undefined ? (
+                    <CountUp
+                      to={stat.countTo}
+                      suffix={stat.suffix}
+                      trailingText={stat.trailingText}
+                      duration={stat.duration}
+                    />
+                  ) : (
+                    stat.value
+                  )}
                 </div>
                 <div className="text-sm font-semibold text-zinc-200 mt-1">
                   {stat.label}
