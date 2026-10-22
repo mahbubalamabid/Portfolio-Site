@@ -99,11 +99,12 @@ export default function ScrollSequence({
       if (ir > cr) {
         h = canvas.height;
         w = h * ir;
-        // On mobile viewports (< 768px), align the visual subject (centered at ~38% across the 16:9 frame for hero)
-        // rather than using 50% image center which pushes the person against the left screen edge.
+        // On mobile viewports (< 768px), align the visual subject (centered at ~43.5% across the 16:9 frame for hero)
+        // rather than using 50% image center (which pushes the subject against the left edge in profile poses)
+        // or 38% (which over-corrects and severely pushes the subject against the right edge in forward-facing poses).
         const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
         const focalX = isMobile
-          ? (mobileFocalX !== undefined ? mobileFocalX : name === "hero" ? 0.38 : 0.5)
+          ? (mobileFocalX !== undefined ? mobileFocalX : name === "hero" ? 0.435 : 0.5)
           : 0.5;
         const targetX = canvas.width * 0.5 - w * focalX;
         const minX = canvas.width - w;
@@ -301,7 +302,7 @@ export default function ScrollSequence({
             muted
             playsInline
             className={`absolute inset-0 h-full w-full object-cover opacity-60 ${
-              name === "hero" ? "object-[38%_center] md:object-center" : "object-center"
+              name === "hero" ? "object-[43.5%_center] md:object-center" : "object-center"
             }`}
             src={`${baseUrl}${name}.mp4`}
             onError={(e) => {

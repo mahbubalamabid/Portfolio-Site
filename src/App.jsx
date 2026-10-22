@@ -24,7 +24,7 @@ export default function App() {
 
         {/* 1. Hero Canvas Sequence */}
         <div id="hero" className="relative">
-          <ScrollSequence name="hero" frameCount={144} scrollLength={4000}>
+          <ScrollSequence name="hero" frameCount={144} scrollLength={4000} mobileFocalX={0.435}>
             {(progress) => <HeroContent progress={progress} />}
           </ScrollSequence>
         </div>
