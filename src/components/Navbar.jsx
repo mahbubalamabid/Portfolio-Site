@@ -121,151 +121,162 @@ export default function Navbar() {
   };
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-black/75 backdrop-blur-md border-b border-white/10 py-3 shadow-lg shadow-black/50"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          {/* Logo & Availability Status */}
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setActiveSection("");
-              if (window.history.pushState) {
-                window.history.pushState(null, "", " ");
-              }
-              if (window.__lenis) {
-                window.__lenis.scrollTo(0, { duration: 1.4 });
-              } else {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            }}
-            className="flex items-center gap-3.5 group text-white decoration-none"
-          >
-            <div className="flex items-center bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
-              <img
-                src={signatureImg}
-                alt="Mahbub Alam Abid"
-                className="h-7 sm:h-8 w-auto object-contain transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]"
-              />
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-black/85 backdrop-blur-md border-b border-white/10 py-2.5 sm:py-3 shadow-lg shadow-black/50"
+            : "bg-transparent py-3 sm:py-5"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveSection("");
+                if (window.history.pushState) {
+                  window.history.pushState(null, "", " ");
+                }
+                if (window.__lenis) {
+                  window.__lenis.scrollTo(0, { duration: 1.4 });
+                } else {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+              className="flex items-center gap-2 group text-white decoration-none shrink-0"
+              title="Mahbub Alam Abid Portfolio"
+              aria-label="Mahbub Alam Abid Portfolio Home"
+            >
+              <div className="flex items-center bg-white/5 border border-white/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full backdrop-blur-md">
+                <img
+                  src={signatureImg}
+                  alt="Mahbub Alam Abid"
+                  className="h-6 sm:h-8 w-auto object-contain transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]"
+                />
+              </div>
+            </a>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`px-3.5 py-1.5 text-xs lg:text-sm rounded-full transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
+                        : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
+                    }`}
+                  >
+                    {link.name}
+                  </a>
+                );
+              })}
+            </nav>
+
+            {/* Desktop Action Buttons */}
+            <div className="hidden md:flex items-center gap-3">
+              <a
+                href="https://github.com/mahbubalamabid"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                title="GitHub Profile"
+                aria-label="GitHub Profile"
+              >
+                <GithubIcon className="w-5 h-5" />
+              </a>
+
+              <a
+                href="#contact"
+                onClick={(e) => handleNavClick(e, "#contact")}
+                className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-cyan-400 text-black text-xs lg:text-sm font-semibold px-4 py-2 rounded-full hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all"
+              >
+                Let's Talk
+                <ArrowUpRight className="w-4 h-4" />
+              </a>
             </div>
-            <div className="hidden sm:flex flex-col border-l border-white/10 pl-3.5 py-0.5">
-              <span className="text-[11px] text-zinc-400 flex items-center gap-1.5 whitespace-nowrap">
-                
-                
-              </span>
+
+            {/* Mobile Header Buttons */}
+            <div className="md:hidden flex items-center gap-1.5">
+              <a
+                href="https://github.com/mahbubalamabid"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                title="GitHub Profile"
+                aria-label="GitHub Profile"
+              >
+                <GithubIcon className="w-5 h-5" />
+              </a>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 text-zinc-300 hover:text-white rounded-lg bg-white/5 border border-white/10 active:scale-95 transition-all cursor-pointer"
+                aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
-          </a>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.href;
-              return (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`px-3.5 py-1.5 text-xs lg:text-sm rounded-full transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
-                      : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
-                  }`}
-                >
-                  {link.name}
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Action Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <a
-              href="https://github.com/mahbubalamabid"
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
-              title="GitHub Profile"
-            >
-              <GithubIcon className="w-5 h-5" />
-            </a>
-
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, "#contact")}
-              className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-cyan-400 text-black text-xs lg:text-sm font-semibold px-4 py-2 rounded-full hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all"
-            >
-              Let's Talk
-              <ArrowUpRight className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
-            <a
-              href="https://github.com/mahbubalamabid"
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 text-zinc-400 hover:text-white"
-            >
-              <GithubIcon className="w-5 h-5" />
-            </a>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-zinc-300 hover:text-white rounded-lg bg-white/5 border border-white/10"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Drawer */}
+        {/* Mobile Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden relative z-50 bg-zinc-950/95 border-b border-white/10 backdrop-blur-xl px-5 sm:px-6 py-5 sm:py-6 mt-2 space-y-3 max-h-[calc(100dvh-4.5rem)] overflow-y-auto shadow-2xl">
+            <div className="flex flex-col space-y-1.5">
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href;
+                return (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`px-4 py-2.5 text-sm rounded-xl transition-all duration-300 min-h-[44px] flex items-center ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
+                        : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
+                    }`}
+                  >
+                    {link.name}
+                  </a>
+                );
+              })}
+            </div>
+
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+              <a
+                href="#contact"
+                onClick={(e) => handleNavClick(e, "#contact")}
+                className="w-full text-center py-3 bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-500 text-black font-bold rounded-xl text-sm hover:brightness-110 active:scale-[0.99] transition-all min-h-[44px] flex items-center justify-center"
+              >
+                Contact Mahbub
+              </a>
+              <a
+                href="mailto:sawfaasbir.abid@gmail.com"
+                className="w-full text-center py-2 text-zinc-400 hover:text-white text-xs flex items-center justify-center gap-1.5 truncate"
+              >
+                <Mail className="w-3.5 h-3.5 shrink-0" /> sawfaasbir.abid@gmail.com
+              </a>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Backdrop overlay for mobile drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-zinc-950/95 border-b border-white/10 backdrop-blur-xl px-6 py-6 mt-3 space-y-3">
-          <div className="flex flex-col space-y-2">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.href;
-              return (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 ${
-                    isActive
-                      ? "bg-gradient-to-r from-cyan-500 to-cyan-400 text-black font-semibold shadow-md shadow-cyan-500/25"
-                      : "font-medium text-zinc-300 hover:text-cyan-400 hover:bg-white/5"
-                  }`}
-                >
-                  {link.name}
-                </a>
-              );
-            })}
-          </div>
-
-          <div className="pt-4 border-t border-white/10 flex flex-col gap-2">
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, "#contact")}
-              className="w-full text-center py-2.5 bg-cyan-400 text-black font-semibold rounded-xl text-sm hover:bg-cyan-300 transition-colors"
-            >
-              Contact Mahbub
-            </a>
-            <a
-              href="mailto:sawfaasbir.abid@gmail.com"
-              className="w-full text-center py-2 text-zinc-400 hover:text-white text-xs flex items-center justify-center gap-1.5"
-            >
-              <Mail className="w-4 h-4" /> sawfaasbir.abid@gmail.com
-            </a>
-          </div>
-        </div>
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden animate-fade-in"
+          aria-hidden="true"
+        />
       )}
-    </header>
+    </>
   );
 }

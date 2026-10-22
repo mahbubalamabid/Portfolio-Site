@@ -69,7 +69,7 @@ export default function ExperienceSection() {
               >
                 {/* Content Card */}
                 <div className="w-full md:w-[calc(50%-2rem)]">
-                  <div className="rounded-2xl bg-zinc-900/70 border border-white/10 p-6 sm:p-8 backdrop-blur-sm hover:border-cyan-500/40 hover:bg-zinc-900/90 transition-all duration-300 group shadow-xl">
+                  <div className="rounded-2xl bg-zinc-900/70 border border-white/10 p-4 min-[360px]:p-6 sm:p-8 backdrop-blur-sm hover:border-cyan-500/40 hover:bg-zinc-900/90 transition-all duration-300 group shadow-xl">
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <span
                         className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${exp.badgeColor}`}

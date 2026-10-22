@@ -279,7 +279,7 @@ export default function ContactSection() {
 
           {/* Right Column: Interactive Contact Form */}
           <div>
-            <div className="rounded-3xl bg-zinc-900/70 border border-white/10 p-6 sm:p-8 backdrop-blur-sm shadow-2xl">
+            <div className="rounded-3xl bg-zinc-900/70 border border-white/10 p-4 min-[360px]:p-6 sm:p-8 backdrop-blur-sm shadow-2xl">
               {submitted ? (
                 <div className="py-12 text-center space-y-4">
                   <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">

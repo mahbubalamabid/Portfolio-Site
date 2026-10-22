@@ -224,7 +224,7 @@ export default function SkillsSection() {
             return (
               <div
                 key={idx}
-                className={`rounded-2xl bg-zinc-900/60 border border-white/10 p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 ${group.borderColor} group`}
+                className={`rounded-2xl bg-zinc-900/60 border border-white/10 p-4 min-[360px]:p-6 sm:p-8 backdrop-blur-sm transition-all duration-300 ${group.borderColor} group`}
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">

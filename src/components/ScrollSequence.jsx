@@ -61,6 +61,10 @@ export default function ScrollSequence({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Enable high-quality bicubic interpolation for crisp rendering on retina displays
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
     const cr = canvas.width / canvas.height;
     const ir = img.naturalWidth / img.naturalHeight;
     let w, h, x, y;
@@ -151,13 +155,18 @@ export default function ScrollSequence({
       const resize = () => {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         if (canvas) {
-          canvas.width = window.innerWidth * dpr;
-          canvas.height = window.innerHeight * dpr;
+          const targetW = Math.round(window.innerWidth * dpr);
+          const targetH = Math.round(window.innerHeight * dpr);
+          if (canvas.width !== targetW || canvas.height !== targetH) {
+            canvas.width = targetW;
+            canvas.height = targetH;
+          }
         }
         draw(Math.round(state.frame));
       };
       resize();
       window.addEventListener("resize", resize);
+      window.addEventListener("orientationchange", resize);
 
       gsap.to(state, {
         frame: frameCount - 1,
@@ -177,7 +186,10 @@ export default function ScrollSequence({
       ScrollTrigger.sort();
       ScrollTrigger.refresh();
 
-      return () => window.removeEventListener("resize", resize);
+      return () => {
+        window.removeEventListener("resize", resize);
+        window.removeEventListener("orientationchange", resize);
+      };
     },
     { dependencies: [frameCount, scrollLength], scope: wrapRef }
   );
@@ -195,7 +207,7 @@ export default function ScrollSequence({
   return (
     <section
       ref={wrapRef}
-      className="relative h-screen w-full overflow-hidden bg-black"
+      className="relative h-screen min-h-[100dvh] w-full overflow-hidden bg-black"
     >
       {/* Primary Canvas for Frame-by-Frame Scroll Scrub */}
       <canvas

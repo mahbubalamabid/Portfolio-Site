@@ -138,7 +138,7 @@ export default function ProjectsSection() {
                   /* Card 1: Confirmed Project (DevStack) with Interactive Preview */
                   <div className="flex flex-col justify-between h-full flex-1">
                     {/* Card Header & Preview Banner */}
-                    <div className={`p-6 sm:p-8 bg-gradient-to-br ${project.accent} border-b border-white/5 relative`}>
+                    <div className={`p-4 min-[360px]:p-6 sm:p-8 bg-gradient-to-br ${project.accent} border-b border-white/5 relative`}>
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                         <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${project.badgeColor}`}>
                           {project.categoryLabel}
@@ -193,16 +193,16 @@ export default function ProjectsSection() {
                         </div>
                       </div>
 
-                      <h3 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-cyan-300 transition-colors">
+                      <h3 className="text-xl min-[360px]:text-2xl sm:text-3xl font-extrabold text-white group-hover:text-cyan-300 transition-colors">
                         {project.title}
                       </h3>
-                      <p className="mt-2 text-sm text-cyan-200/80 font-medium leading-relaxed">
+                      <p className="mt-2 text-xs sm:text-sm text-cyan-200/80 font-medium leading-relaxed">
                         {project.subtitle}
                       </p>
                     </div>
 
                     {/* Central Content Area: Transitions between Details and Live Preview */}
-                    <div className="relative flex-1 p-6 sm:p-8 flex flex-col justify-between overflow-hidden min-h-[360px]">
+                    <div className="relative flex-1 p-4 min-[360px]:p-6 sm:p-8 flex flex-col justify-between overflow-hidden min-h-[300px] sm:min-h-[360px]">
                       {/* State A: Detailed Project Information */}
                       <div
                         className={`flex flex-col justify-between h-full space-y-6 motion-safe:transition-all duration-300 ease-in-out ${
@@ -284,7 +284,7 @@ export default function ProjectsSection() {
                     </div>
 
                     {/* Footer: repository/details link and live-demo link */}
-                    <div className="px-6 pb-6 sm:px-8 sm:pb-8 pt-0 border-t border-white/5">
+                    <div className="px-4 pb-4 min-[360px]:px-6 min-[360px]:pb-6 sm:px-8 sm:pb-8 pt-0 border-t border-white/5">
                       <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
                         <a
                           href={project.github}
